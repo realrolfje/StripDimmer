@@ -30,6 +30,8 @@ void setup() {
 }
 
 void loop() {
+//  printTouch();
+//  return;
 
     dimLow(0);
     
@@ -74,9 +76,14 @@ void loop() {
   
   
 }
+void printTouch(){
+  int total = capsense.capacitiveSensor(30);
+  Serial.println(total);  
+}
+
 
 void waitForTouch(){
-  while(capsense.capacitiveSensor(30) < 3000) { };
+  while(capsense.capacitiveSensor(30) < 7000) { };
 }
 
 void dim1(){
