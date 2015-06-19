@@ -1,14 +1,11 @@
+#include <TimerOne.h>
 
 const int redPin   = 9;
 const int greenPin = 10;
 const int bluePin  = 11;
 
-int red = 0;
-int green = 0;
-int blue = 0;
-
-int lowRed   = 22;
-int lowGreen = 2;
+int lowRed   = 22*3;
+int lowGreen = 2*3;
 int lowBlue  = 0;
 
 int highRed  = 255;
@@ -20,26 +17,82 @@ int inc = 2;
 void setup() {
   Serial.begin(57600);
   
-  // put your setup code here, to run once:
   pinMode(redPin, OUTPUT); 
   pinMode(greenPin, OUTPUT); 
   pinMode(bluePin, OUTPUT); 
   
-  stripColor(red,green,blue);
+  Timer1.initialize(1);
+  Timer1.attachInterrupt(ledpwm);
+
+  stripColor(0,0,0);
 //  stripColor(10,10,10);
   
 }
 
-void loop() {
+volatile int red=1023;
+volatile int green=1023;
+volatile int blue=1023;
 
-    dimHigh(0);
-//    dimLow(0);
+int countperiod=1023;
+int countred=0;
+int countgreen=0;
+int countblue=0;
+
+void ledpwm(){
+  if (countperiod == 0){
+    countperiod = 1024;
+    
+    countred = red;     if (countred > 0)   digitalWrite(redPin, HIGH);
+    countgreen = green; if (countgreen > 0) digitalWrite(greenPin, HIGH);
+    countblue = blue;   if (countblue > 0) digitalWrite(bluePin, HIGH);
+  } else {
+    countperiod--;
+  }
+  
+  if (countred == 0) {
+    digitalWrite(redPin, LOW);
+  } else {
+    // decreases past 0 but no problem since int is bigger than 1024 bits period
+    countred--;
+  }    
+  
+  if (countgreen == 0) {
+    digitalWrite(greenPin, LOW);
+  } else {
+    countgreen--;
+  }    
+
+  if (countblue == 0) {
+    digitalWrite(bluePin, LOW);
+  } else {
+    countblue--;
+  }    
+}
+
+void loop() {
+    stripColor(1,0,0);
+    delay(500);
+    stripColor(2,0,0);
+    delay(500);
+    stripColor(0,1,0);
+    delay(500);
+    stripColor(0,2,0);
+    delay(500);
+    stripColor(0,0,1);
+    delay(500);
+    stripColor(0,0,2);
+    delay(500);
+    return;
+  
+  
+//    dimHigh(0);
+    dimLow(0);
     delay(1000);
 
-    for (int i=0; i<=100; i++) {
-      dimHigh((float) i / 100);
-//      dimLow((float) i / 100);
-      delay(20);
+    for (int i=0; i<=1000; i++) {
+//      dimHigh((float) i / 100);
+      dimLow((float) i / 1000);
+//      delay(1);
     }
     
     delay(1000);
@@ -76,10 +129,10 @@ void loop() {
   
 }
 
-void stripColor(int red, int green, int blue){
-  analogWrite(redPin, red);
-  analogWrite(greenPin, green);
-  analogWrite(bluePin, blue);
+void stripColor(int newRed, int newGreen, int newBlue){
+  red = newRed;
+  green = newGreen;
+  blue = newBlue;  
 }
 
 void dimHigh(float dim) {
