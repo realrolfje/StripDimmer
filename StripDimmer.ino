@@ -6,8 +6,13 @@ const int bluePin  = 11;
 
 const int ledPin = 13;
 
+const int irPin = 6;
+
+const int irTime = 10000;
+unsigned long onUntilMillis;
+
 int lowRed   = 22;
-int lowGreen = 5;
+int lowGreen = 8;
 int lowBlue  = 0;
 
 int highRed  = 255;
@@ -16,7 +21,6 @@ int highBlue = 45;
 
 const int capsens_signal_pin = 4;
 const int capsens_sense_pin = 3;
-
 
 // 10M resistor between pins, add 1n4148 from sense to 5V and 10k from sense to toucharea
 CapacitiveSensor capsense = CapacitiveSensor(capsens_signal_pin,capsens_sense_pin);
@@ -28,11 +32,25 @@ void setup() {
   pinMode(greenPin, OUTPUT); 
   pinMode(bluePin, OUTPUT); 
   pinMode(ledPin, OUTPUT); 
+  pinMode(irPin, INPUT); 
 
   stripColor(0,0,0);
 }
 
 void loop() {
+    checkIr();
+    
+    if (millis()<onUntilMillis){
+      dimLow(1);
+    } else {
+      dimLow(0);
+    }
+    
+    return;
+  
+    digitalWrite(ledPin, digitalRead(irPin));
+    return;
+  
     dimLow(0);
     waitForTouch();
     dim1();
@@ -48,6 +66,14 @@ void waitForTouch(){
   digitalWrite(ledPin,HIGH);
   while(capsense.capacitiveSensor(30) < 10000) { };
   digitalWrite(ledPin,LOW);
+}
+
+void checkIr(){
+  boolean irState = digitalRead(irPin);
+  digitalWrite(ledPin, irState);
+  if(irState){
+    onUntilMillis = millis() + irTime;
+  }
 }
 
 void dim1(){
