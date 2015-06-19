@@ -1,102 +1,40 @@
-#include <TimerOne.h>
 
 const int redPin   = 9;
 const int greenPin = 10;
 const int bluePin  = 11;
 
-int lowRed   = 22*3;
-int lowGreen = 2*3;
+int lowRed   = 22;
+int lowGreen = 5;
 int lowBlue  = 0;
 
 int highRed  = 255;
-int highGreen= 145;
+int highGreen= 245;
 int highBlue = 45;
 
-int inc = 2;
-
 void setup() {
-  Serial.begin(57600);
+//  Serial.begin(57600);
   
   pinMode(redPin, OUTPUT); 
   pinMode(greenPin, OUTPUT); 
   pinMode(bluePin, OUTPUT); 
-  
-  Timer1.initialize(1);
-  Timer1.attachInterrupt(ledpwm);
 
   stripColor(0,0,0);
-//  stripColor(10,10,10);
-  
-}
-
-volatile int red=1023;
-volatile int green=1023;
-volatile int blue=1023;
-
-int countperiod=1023;
-int countred=0;
-int countgreen=0;
-int countblue=0;
-
-void ledpwm(){
-  if (countperiod == 0){
-    countperiod = 1024;
-    
-    countred = red;     if (countred > 0)   digitalWrite(redPin, HIGH);
-    countgreen = green; if (countgreen > 0) digitalWrite(greenPin, HIGH);
-    countblue = blue;   if (countblue > 0) digitalWrite(bluePin, HIGH);
-  } else {
-    countperiod--;
-  }
-  
-  if (countred == 0) {
-    digitalWrite(redPin, LOW);
-  } else {
-    // decreases past 0 but no problem since int is bigger than 1024 bits period
-    countred--;
-  }    
-  
-  if (countgreen == 0) {
-    digitalWrite(greenPin, LOW);
-  } else {
-    countgreen--;
-  }    
-
-  if (countblue == 0) {
-    digitalWrite(bluePin, LOW);
-  } else {
-    countblue--;
-  }    
 }
 
 void loop() {
-    stripColor(1,0,0);
-    delay(500);
-    stripColor(2,0,0);
-    delay(500);
-    stripColor(0,1,0);
-    delay(500);
-    stripColor(0,2,0);
-    delay(500);
-    stripColor(0,0,1);
-    delay(500);
-    stripColor(0,0,2);
-    delay(500);
-    return;
-  
-  
-//    dimHigh(0);
+
     dimLow(0);
     delay(1000);
 
-    for (int i=0; i<=1000; i++) {
-//      dimHigh((float) i / 100);
-      dimLow((float) i / 1000);
-//      delay(1);
-    }
-    
+    dim1();
     delay(1000);
-  
+    dim2();
+    delay(1000);
+    dim3();
+    delay(1000);
+    dim4();
+    delay(1000);
+
 //  while (Serial.available() > 0){
 //    char c = Serial.read();
 //    
@@ -129,10 +67,42 @@ void loop() {
   
 }
 
+void dim1(){
+    for (int i=0; i<100; i++) {
+      dimLow((float) i / 100);
+      delay(15);
+    }
+}
+
+void dim2(){
+      for (int j=0; j<=100; j++) {
+      dimHigh((float) j / 100);
+      delay(15);
+    }   
+}
+
+void dim3(){
+      for (int j=100; j>=0; j--) {
+      dimHigh((float) j / 100);
+      delay(15);
+    }   
+}
+
+void dim4(){
+      for (int j=100; j>=0; j--) {
+      dimLow((float) j / 100);
+      delay(15);
+    }   
+}
+
+int oldRed = 0;
+int oldGreen = 0;
+int oldBlue = 0;
+
 void stripColor(int newRed, int newGreen, int newBlue){
-  red = newRed;
-  green = newGreen;
-  blue = newBlue;  
+  if (newRed != oldRed) {analogWrite(redPin,newRed); oldRed = newRed; }
+  if (newGreen != oldGreen) {analogWrite(greenPin,newGreen); oldGreen = newGreen; }
+  if (newBlue != oldBlue) {analogWrite(bluePin,newBlue); oldBlue = newBlue; }
 }
 
 void dimHigh(float dim) {
@@ -152,3 +122,5 @@ void dimLow(float dim){
 int calcDim(int low, int high, float dim) {
   return (0.5 + low + dim * (high-low));
 }
+
+
