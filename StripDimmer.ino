@@ -1,3 +1,4 @@
+#include <CapacitiveSensor.h>
 
 const int redPin   = 9;
 const int greenPin = 10;
@@ -10,6 +11,13 @@ int lowBlue  = 0;
 int highRed  = 255;
 int highGreen= 245;
 int highBlue = 45;
+
+const int capsens_signal_pin = 4;
+const int capsens_sense_pin = 3;
+
+
+// 10M resistor between pins, add 1n4148 from sense to 5V and 10k from sense to toucharea
+CapacitiveSensor capsense = CapacitiveSensor(capsens_signal_pin,capsens_sense_pin);
 
 void setup() {
 //  Serial.begin(57600);
@@ -24,16 +32,16 @@ void setup() {
 void loop() {
 
     dimLow(0);
-    delay(1000);
+    
 
+    waitForTouch();
     dim1();
-    delay(1000);
+    waitForTouch();
     dim2();
-    delay(1000);
+    waitForTouch();
     dim3();
-    delay(1000);
+    waitForTouch();
     dim4();
-    delay(1000);
 
 //  while (Serial.available() > 0){
 //    char c = Serial.read();
@@ -65,6 +73,10 @@ void loop() {
 //  }
   
   
+}
+
+void waitForTouch(){
+  while(capsense.capacitiveSensor(30) < 3000) { };
 }
 
 void dim1(){
