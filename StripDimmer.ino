@@ -4,6 +4,8 @@ const int redPin   = 9;
 const int greenPin = 10;
 const int bluePin  = 11;
 
+const int ledPin = 13;
+
 int lowRed   = 22;
 int lowGreen = 5;
 int lowBlue  = 0;
@@ -25,17 +27,13 @@ void setup() {
   pinMode(redPin, OUTPUT); 
   pinMode(greenPin, OUTPUT); 
   pinMode(bluePin, OUTPUT); 
+  pinMode(ledPin, OUTPUT); 
 
   stripColor(0,0,0);
 }
 
 void loop() {
-//  printTouch();
-//  return;
-
     dimLow(0);
-    
-
     waitForTouch();
     dim1();
     waitForTouch();
@@ -44,46 +42,12 @@ void loop() {
     dim3();
     waitForTouch();
     dim4();
-
-//  while (Serial.available() > 0){
-//    char c = Serial.read();
-//    
-//    if (c == 'r') {
-//      red = constrain(red-inc, 0, 255); 
-//    } else if (c == 'R') {
-//      red = constrain(red+inc, 0, 255);
-//    } else if (c == 'g') {
-//      green = constrain(green-inc, 0, 255);
-//    } else if (c == 'G') {
-//      green = constrain(green+inc, 0, 255);
-//    } else if (c == 'b') {
-//      blue = constrain(blue-inc, 0, 255);
-//    } else if (c == 'B') {
-//      blue = constrain(blue+inc, 0, 255);
-//    } else {
-//      continue;
-//    }  
-//
-//    Serial.print(c);
-//    Serial.print(' ');
-//    Serial.print(red, DEC);
-//    Serial.print(' ');
-//    Serial.print(green, DEC);
-//    Serial.print(' ');
-//    Serial.println(blue,DEC);
-//    stripColor(red, green, blue);
-//  }
-  
-  
 }
-void printTouch(){
-  int total = capsense.capacitiveSensor(30);
-  Serial.println(total);  
-}
-
 
 void waitForTouch(){
-  while(capsense.capacitiveSensor(30) < 7000) { };
+  digitalWrite(ledPin,HIGH);
+  while(capsense.capacitiveSensor(30) < 10000) { };
+  digitalWrite(ledPin,LOW);
 }
 
 void dim1(){
