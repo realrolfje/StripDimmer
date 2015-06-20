@@ -16,8 +16,8 @@ int oldbrightness = 0;
 
 /* Same as dimThousands, but slowly increases/decreases to end up at the given value */
 void goToDimThousands(int brightness) {
-  Serial.print("Dimming from ");  Serial.print(oldbrightness, DEC);
-  Serial.print(" to "); Serial.println(brightness, DEC);
+//  Serial.print("Dimming from ");  Serial.print(oldbrightness, DEC);
+//  Serial.print(" to "); Serial.println(brightness, DEC);
 
   int inc = 1;
   if (brightness < oldbrightness) {

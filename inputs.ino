@@ -2,35 +2,19 @@
 
 boolean personPresent = false;
 
-int waitForActivity(){
-  while(true){
-    int sense = capsense.capacitiveSensor(30);
-//    Serial.println(sense);  
+boolean hasPIR(){
+  return digitalRead(irPin);
+}
 
-    if ( sense > touchSensitivity) {
-      personPresent = true;
-      blink();
-      Serial.print("Touched sensor ");
-      Serial.println(sense,DEC);
-      return ACTIVITY_TOUCH;
-    }
-    
-    boolean pirDetected = digitalRead(irPin);
-    if (!personPresent && pirDetected){
-      blink();
-      blink();
-      Serial.println("Person entered the room");
-      personPresent = true;
-      return ACTIVITY_PERSON_ENTERED;
-    } else if (personPresent && !pirDetected) {
-      personPresent = false;
-      blink();
-      blink();
-      blink();
-      Serial.println("Person left the room");
-      return ACTIVITY_PERSON_LEFT;
-    }
+boolean hasTouched() {
+  int sense = capsense.capacitiveSensor(30);
+  if ( sense > touchSensitivity) {
+    blink();
+    Serial.print("Touched sensor ");
+    Serial.println(sense,DEC);
+    return true;
   }
+  return false;
 }
 
 void blink(){
@@ -38,21 +22,5 @@ void blink(){
   delay(50);
   digitalWrite(ledPin,LOW);
   delay(50);
-}
-
-void waitForTouch(){
-  int sense = 0;
-  while((sense = capsense.capacitiveSensor(30)) < touchSensitivity) { };
-  digitalWrite(ledPin,HIGH);
-  Serial.println(sense,DEC);
-  digitalWrite(ledPin,LOW);
-}
-
-void checkIr(){
-  boolean irState = digitalRead(irPin);
-  digitalWrite(ledPin, irState);
-  if(irState){
-    onUntilMillis = millis() + irTime;
-  }
 }
 

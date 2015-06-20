@@ -45,43 +45,67 @@ void setup() {
 }
 
 void loop() {
-//  printTouch();
+  // Debugging stuff:
+  //  printTouch();
   //  colorMixer();
 
-  // Low (off) state
-  offLoop();
-
-  // High (on) state
-  onLoop();
+  offLoop();  // Low (off) state
+  onLoop();   // High (on) state
 }
 
 void offLoop(){
-  Serial.println("OFF loop");
-  goToDimThousands(0);
+  Serial.println("--- Entering OFF state ---");
+  int keepDimMs = 5000;
+  int brightness = 250;  goToDimThousands(brightness);
+  long ignorePIRUntil = millis() + keepDimMs;
 
-    // Low (off) state
+  // Low (off) state
   while(true) {
-    int activity = waitForActivity();
-    if (activity == ACTIVITY_PERSON_ENTERED) {
-      goToDimThousands(250);
-    } else if (activity == ACTIVITY_PERSON_LEFT) {
-      goToDimThousands(0);
-    } if (activity == ACTIVITY_TOUCH) {
+    if (hasTouched()){
+      Serial.println("OFF: User touched sensor. Exit.");
       return;
+    }
+
+    if (hasPIR()) {
+      ignorePIRUntil = millis() + keepDimMs;
+      if(brightness != 250) {
+        Serial.println("OFF: PIR activity. Turning on the lights.");
+        brightness = 250; goToDimThousands(brightness);
+      }
+    } else if (brightness == 250 && millis() > ignorePIRUntil) {
+        Serial.println("OFF: No more PIR activity. Turning off the lights.");
+      brightness = 0; goToDimThousands(brightness);
     }
   }
 }
 
 void onLoop() {
-  Serial.println("ON loop");
-  goToDimThousands(1000);
+  Serial.println("--- Entering ON state ---");
+  int brightness = 1000;  goToDimThousands(brightness);
+  
+  int keepBrightMs = 5000;
+  int keepDimMs = 5000;
+  long ignorePIRUntil = millis() + keepBrightMs;
+
   while(true) {
-    int activity = waitForActivity();
-    if (activity == ACTIVITY_PERSON_ENTERED) {
-      goToDimThousands(1000);
-    } else if (activity == ACTIVITY_PERSON_LEFT) {
-      goToDimThousands(250);
-    } if (activity == ACTIVITY_TOUCH) {
+    if (hasTouched()){
+      Serial.println("ON: User touched sensor. Exit.");
+      return;
+    }
+     
+    if (hasPIR()){
+      ignorePIRUntil = millis() + keepBrightMs;
+      
+      if (brightness != 1000) {
+        Serial.println("ON: PIR activity. Switching to full brightness.");
+        brightness = 1000; goToDimThousands(brightness);
+      }
+    } else if (brightness == 1000 && millis() > ignorePIRUntil) {
+      Serial.println("ON: No PIR activity for a while. Dimming the lights.");
+      ignorePIRUntil = millis() + keepDimMs;
+      brightness = 250; goToDimThousands(brightness);
+    } else if (brightness == 250 && millis() > ignorePIRUntil) {      
+      Serial.println("ON: No PIR activity for a long time. Exit ON state.");
       return;
     }
   }
