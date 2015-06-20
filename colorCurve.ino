@@ -1,10 +1,15 @@
 
-#define colorcurvesize 3
+#define colorcurvesize 8
 int colorcurve [colorcurvesize][3] = 
   {
     { 0, 0, 0 },
-    { 22, 8, 0 },
-    { 255, 245, 45 }
+    { 10, 2, 0 },
+    { 31, 14, 2},
+    { 58, 33, 5 },
+    { 95, 63, 7 },
+    { 145, 106, 14 },
+    { 195, 171, 32 },
+    { 255, 255, 76 }
   };
 
 int oldbrightness = 0;

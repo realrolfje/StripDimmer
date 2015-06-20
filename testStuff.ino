@@ -1,12 +1,16 @@
 void printTouch(){
-  int total = capsense.capacitiveSensor(30);
-  Serial.println(total);  
+  while(true){
+    int total = capsense.capacitiveSensor(30);
+    Serial.println(total);  
+  }
 }
 
 void colorMixer() {
-  int red = 128;
-  int green = 128;
-  int blue = 128;
+  int red = 127;
+  int green = 107;
+  int blue = 20;
+  stripColor(red, green, blue);
+  
   int inc = 2;
   while(true){
     while (Serial.available() > 0){
@@ -28,13 +32,13 @@ void colorMixer() {
         continue;
       }  
   
-      Serial.print(c);
-      Serial.print(' ');
+      Serial.print(" { ");
       Serial.print(red, DEC);
-      Serial.print(' ');
+      Serial.print(", ");
       Serial.print(green, DEC);
-      Serial.print(' ');
-      Serial.println(blue,DEC);
+      Serial.print(", ");
+      Serial.print(blue,DEC);
+      Serial.println(" },");
       stripColor(red, green, blue);
     }
   }
