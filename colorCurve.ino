@@ -16,6 +16,11 @@ int oldbrightness = 0;
 
 /* Same as dimThousands, but slowly increases/decreases to end up at the given value */
 void goToDimThousands(int brightness) {
+  goToDimThousands(brightness,1, false);
+}
+
+/* Same as dimThousands, but slowly increases/decreases to end up at the given value */
+void goToDimThousands(int brightness, int stepDelayMs, boolean checkPIR) {
 //  Serial.print("Dimming from ");  Serial.print(oldbrightness, DEC);
 //  Serial.print(" to "); Serial.println(brightness, DEC);
 
@@ -26,10 +31,10 @@ void goToDimThousands(int brightness) {
   
   for (int i=oldbrightness; i!=brightness; i = i + inc) {
     dimThousands(i);
-    delay(1);
-  }
-  
-  oldbrightness = brightness;
+    oldbrightness = i;
+    delay(stepDelayMs);
+    if (checkPIR && hasPIR()) break;
+  }  
 }
 
 

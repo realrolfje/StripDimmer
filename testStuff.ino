@@ -5,6 +5,14 @@ void printTouch(){
   }
 }
 
+void printLDR(){
+  while(true){
+    int light = analogRead(ldrPin);
+    Serial.println(light);
+    delay(200);
+  }
+}
+
 void colorMixer() {
   int red = 127;
   int green = 107;

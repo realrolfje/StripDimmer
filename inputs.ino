@@ -1,9 +1,16 @@
-#define touchSensitivity 7000
+#define touchSensitivity 5000
+#define darkness 400
 
 boolean personPresent = false;
 
 boolean hasPIR(){
-  return digitalRead(irPin);
+  boolean pir = digitalRead(irPin);
+  digitalWrite(redLedPin, pir);
+  return pir;
+}
+
+boolean isDark(){
+  return analogRead(ldrPin) >= darkness;
 }
 
 boolean hasTouched() {
@@ -18,9 +25,24 @@ boolean hasTouched() {
 }
 
 void blink(){
-  digitalWrite(ledPin,HIGH);
+  digitalWrite(greenLedPin,HIGH);
   delay(50);
-  digitalWrite(ledPin,LOW);
+  digitalWrite(greenLedPin,LOW);
   delay(50);
+}
+
+boolean isPassed(unsigned long targetTime) {
+  unsigned long currTime = millis();
+  
+  if ( targetTime > 2147483647 && currTime < 640000) {
+    // rollover
+    return true;
+  }
+
+  if ( currTime > targetTime) {
+    return true;
+  }
+
+  return false;
 }
 
