@@ -12,8 +12,6 @@ int colorcurve [colorcurvesize][3] =
     { 255, 255, 76 }
   };
 
-int oldbrightness = 0;
-
 /* Same as dimThousands, but slowly increases/decreases to end up at the given value */
 void goToDimThousands(int brightness) {
   goToDimThousands(brightness,1, false);
@@ -25,16 +23,17 @@ void goToDimThousands(int brightness, int stepDelayMs, boolean checkPIR) {
 //  Serial.print(" to "); Serial.println(brightness, DEC);
 
   int inc = 1;
-  if (brightness < oldbrightness) {
+  if (brightness < currentBrightness) {
     inc = -1;
   }
   
-  for (int i=oldbrightness; i!=brightness; i = i + inc) {
+  for (int i=currentBrightness; i!=brightness; i = i + inc) {
     dimThousands(i);
-    oldbrightness = i;
+    currentBrightness = i;
     delay(stepDelayMs);
     if (checkPIR && hasPIR()) break;
   }  
+  currentBrightness = brightness;
 }
 
 
