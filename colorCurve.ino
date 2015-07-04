@@ -4,12 +4,12 @@ int colorcurve [colorcurvesize][3] =
   {
     { 0, 0, 0 },
     { 10, 2, 0 },
-    { 31, 14, 2},
+    { 31, 14, 1},
     { 58, 33, 5 },
     { 95, 63, 7 },
     { 145, 106, 14 },
-    { 195, 171, 32 },
-    { 255, 255, 76 }
+    { 195, 171, 31 },
+    { 255, 255, 74 }
   };
 
 /* Same as dimThousands, but slowly increases/decreases to end up at the given value */
@@ -34,6 +34,7 @@ void goToDimThousands(int brightness, int stepDelayMs, boolean checkPIR) {
     if (checkPIR && hasPIR()) break;
   }  
   currentBrightness = brightness;
+//  Serial.print("Ended loop at brightness "); Serial.println(currentBrightness,DEC);
 }
 
 
@@ -70,8 +71,15 @@ int oldGreen = 0;
 int oldBlue = 0;
 
 void stripColor(int newRed, int newGreen, int newBlue){
-  if (newRed != oldRed) {analogWrite(redPin,newRed); oldRed = newRed; }
-  if (newGreen != oldGreen) {analogWrite(greenPin,newGreen); oldGreen = newGreen; }
-  if (newBlue != oldBlue) {analogWrite(bluePin,newBlue); oldBlue = newBlue; }
+  boolean changed = false;
+  if (newRed != oldRed) {analogWrite(redPin,newRed); oldRed = newRed; changed = true;}
+  if (newGreen != oldGreen) {analogWrite(greenPin,newGreen); oldGreen = newGreen; changed = true;}
+  if (newBlue != oldBlue) {analogWrite(bluePin,newBlue); oldBlue = newBlue; changed = true;}
+  
+  if (changed) {
+//    Serial.print("R="); Serial.print(newRed,DEC);
+//    Serial.print(" G="); Serial.print(newGreen,DEC);
+//    Serial.print(" B="); Serial.println(newBlue,DEC);
+  }
 }
 

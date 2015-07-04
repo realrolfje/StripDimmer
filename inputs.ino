@@ -1,6 +1,6 @@
 #define touchSensitivity 1800
 #define darkness 400
-#define darknessWithDimmedLights 100
+#define darknessWithDimmedLights 80
 
 boolean personPresent = false;
 

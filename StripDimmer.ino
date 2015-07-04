@@ -67,6 +67,8 @@ void setup() {
   
   capsense.set_CS_AutocaL_Millis(5000);
   capsense.set_CS_Timeout_Millis(200);
+
+  goToDimThousands(0); // Init LEDs to off state.
 }
 
 void loop() {
@@ -81,9 +83,16 @@ void loop() {
 //  printLDR();
 //  colorMixer();
 
-  goToDimThousands(0); // Init LEDs to off state.
   offLoop();           // Low (off) state
   onLoop();            // High (on) state
+}
+
+void printBrightness(){
+  Serial.print("Current LED brightness is ");
+  Serial.print(currentBrightness,DEC);
+  Serial.print(", and LDR is ");
+  Serial.print(analogRead(ldrPin),DEC);
+  Serial.println(".");
 }
 
 void offLoop(){
@@ -92,10 +101,18 @@ void offLoop(){
   digitalWrite(greenLedPin, LOW);
   unsigned long keepDimMs = 60000; // one minute
 
-  if (currentBrightness == 250 && isTooBrightDimmed()){
-    goToDimThousands(0);
-  }
+//  printBrightness();
   
+  if (currentBrightness == 1000){
+     goToDimThousands(250);
+    
+//     printBrightness();
+     if (isTooBrightDimmed()){
+       Serial.println("OFF: Too bright, turning off the lights completely.");
+       goToDimThousands(0);
+     }
+      
+  }
   
   capsense.reset_CS_AutoCal();
 
@@ -125,6 +142,7 @@ void offLoop(){
       if(currentBrightness != 250) {
         Serial.println("OFF: PIR activity in the dark. Turning on the lights.");
         goToDimThousands(250);
+        printBrightness();
       }
     } else if (currentBrightness == 250 && isPassed(ignorePIRUntil)) {
       Serial.println("OFF: No more PIR activity. Turning off the lights.");
