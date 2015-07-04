@@ -1,5 +1,6 @@
-#define touchSensitivity 5000
+#define touchSensitivity 1800
 #define darkness 400
+#define darknessWithDimmedLights 100
 
 boolean personPresent = false;
 
@@ -9,13 +10,19 @@ boolean hasPIR(){
   return pir;
 }
 
+boolean isTooBrightDimmed(){
+  return analogRead(ldrPin) <= darknessWithDimmedLights;
+}
+
+
 boolean isDark(){
   return analogRead(ldrPin) >= darkness;
 }
 
 boolean hasTouched() {
-  int sense = capsense.capacitiveSensor(30);
-  if ( sense > touchSensitivity) {
+  delay(1);
+  long sense = capsense.capacitiveSensor(30);
+  if ( sense < 0 || sense > touchSensitivity) {
     blink();
     Serial.print("Touched sensor ");
     Serial.println(sense,DEC);

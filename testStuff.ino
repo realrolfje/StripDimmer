@@ -1,7 +1,15 @@
+
 void printTouch(){
   while(true){
-    int total = capsense.capacitiveSensor(30);
-    Serial.println(total);  
+    int i = 10;
+    while(i--){    
+      long total = capsense.capacitiveSensor(30);
+      Serial.println(total,DEC); 
+      delay(500); 
+    }
+    capsense.reset_CS_AutoCal();
+    Serial.println("reset autocal"); 
+
   }
 }
 
