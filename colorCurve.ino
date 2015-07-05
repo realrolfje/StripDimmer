@@ -19,8 +19,7 @@ void goToDimThousands(int brightness) {
 
 /* Same as dimThousands, but slowly increases/decreases to end up at the given value */
 void goToDimThousands(int brightness, int stepDelayMs, boolean checkPIR) {
-//  Serial.print("Dimming from ");  Serial.print(oldbrightness, DEC);
-//  Serial.print(" to "); Serial.println(brightness, DEC);
+  Log.Debug("Dimming from %d to %d.",currentBrightness,brightness);
 
   int inc = 1;
   if (brightness < currentBrightness) {
@@ -31,10 +30,12 @@ void goToDimThousands(int brightness, int stepDelayMs, boolean checkPIR) {
     dimThousands(i);
     currentBrightness = i;
     delay(stepDelayMs);
-    if (checkPIR && hasPIR()) break;
+    if (checkPIR && hasPIR()) {
+      Log.Debug("Dimming interrupted at %d by PIR.",currentBrightness);
+      break;
+    }
   }  
   currentBrightness = brightness;
-//  Serial.print("Ended loop at brightness "); Serial.println(currentBrightness,DEC);
 }
 
 
@@ -44,19 +45,23 @@ void dimThousands(int brightness){
   
   // Find the two indices
   float findex = (float) (brightness * (colorcurvesize-1)) / 1000;
-
   int lowindex = constrain((int) findex,0,colorcurvesize-1);
   int highindex = constrain(lowindex+1,0,colorcurvesize-1);
   
+  // RGB color from the lower index in the array
   int red = colorcurve[lowindex][0];
   int green = colorcurve[lowindex][1];
   int blue = colorcurve[lowindex][2];
     
   if (lowindex != highindex) {
+    // lowindex and highindex are not the same so we need to interpolate
+    
+    // RGB color from the higher index in the array
     int hred   = colorcurve[highindex][0];
     int hgreen = colorcurve[highindex][1];
     int hblue  = colorcurve[highindex][2];
     
+    // The Lineair interpolated color between the two array points
     float ratio = findex - lowindex;
     red   = (int) (0.5 + red   + (ratio * (hred   - red  )));
     green = (int) (0.5 + green + (ratio * (hgreen - green)));
@@ -77,9 +82,7 @@ void stripColor(int newRed, int newGreen, int newBlue){
   if (newBlue != oldBlue) {analogWrite(bluePin,newBlue); oldBlue = newBlue; changed = true;}
   
   if (changed) {
-//    Serial.print("R="); Serial.print(newRed,DEC);
-//    Serial.print(" G="); Serial.print(newGreen,DEC);
-//    Serial.print(" B="); Serial.println(newBlue,DEC);
+    Log.Debug("Set color to R=%d G=%d B=%d.",newRed,newGreen,newBlue);
   }
 }
 

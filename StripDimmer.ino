@@ -1,11 +1,9 @@
 #include <CapacitiveSensor.h>
+#include <Logging.h>
 
-#define ACTIVITY_PERSON_ENTERED  1
-#define ACTIVITY_PERSON_LEFT  2
-#define ACTIVITY_TOUCH  3
-
-
-
+//
+// Hardware configuration
+//
 const int redPin   = 9;
 const int greenPin = 10;
 const int bluePin  = 11;
@@ -18,18 +16,39 @@ const int ldrPin = A0;
 
 const int irPin = 6;
 
-unsigned long onUntilMillis;
-
-int lowRed   = 22;
-int lowGreen = 8;
-int lowBlue  = 0;
-
-int highRed  = 255;
-int highGreen= 245;
-int highBlue = 45;
-
 const int capsens_signal_pin = 4;
 const int capsens_sense_pin = 3;
+
+//
+// Configuration and constants
+//
+
+// Uncomment to switch off debugging
+#define DEBUG
+
+const int touchSensitivity = 1800;       // Lower value is higher Touch sensitivity.
+const int darkness = 400;                // LDR level at which lights will go on at PIR activity in OFF state.
+const int darknessWithDimmedLights = 80; // LDR level at which lights will go completely off when going from ON to OFF state.
+
+const int maxBrightness = 1000;          // Index used to set the highest RGB LED brightness.
+const int dimmedBrightness = 250;        // Index used to set dimmed RGB LED brightness.
+
+#ifdef DEBUG
+  #define LOGLEVEL LOG_LEVEL_DEBUG
+  const unsigned long keepBrightMs =  3000; // Max Full-Brightness time without PIR activity
+  const unsigned long keepOnDimMs  =  9000; // Max Dimmed time when ON without PIR activity
+  const unsigned long keepOffDimMs =  6000; // Max Dimmed time when OFF without PIR activity
+#else 
+  #define LOGLEVEL LOG_LEVEL_ERROR
+  const unsigned long keepBrightMs =  300000; // Max Full-Brightness time without PIR activity
+  const unsigned long keepOnDimMs  = 7200000; // Max Dimmed time when ON without PIR activity
+  const unsigned long keepOffDimMs =   60000; // Max Dimmed time when OFF without PIR activity
+#endif
+
+//
+// Local variables
+//
+unsigned long ignorePIRUntil = 0;
 
 // 10M resistor between pins, add 1n4148 from sense to 5V and 10k from sense to toucharea
 CapacitiveSensor capsense = CapacitiveSensor(capsens_signal_pin,capsens_sense_pin);
@@ -37,8 +56,7 @@ CapacitiveSensor capsense = CapacitiveSensor(capsens_signal_pin,capsens_sense_pi
 int currentBrightness = 0;
 
 void setup() {
-  Serial.begin(57600);
-  randomSeed(analogRead(0));
+  Log.Init(LOGLEVEL, 57600L);
 
   pinMode(redPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
@@ -51,18 +69,7 @@ void setup() {
 
   pinMode(ldrPin, INPUT);
 
-  digitalWrite(redLedPin, HIGH);
-  delay(100);
-  digitalWrite(yellowLedPin, HIGH);
-  delay(100);
-  digitalWrite(greenLedPin, HIGH);
-  delay(100);
-  digitalWrite(redLedPin, LOW);
-  delay(100);
-  digitalWrite(yellowLedPin, LOW);
-  delay(100);
-  digitalWrite(greenLedPin, LOW);
-
+  blinkSignalLeds();
   stripColor(0,0,0);
   
   capsense.set_CS_AutocaL_Millis(5000);
@@ -87,43 +94,28 @@ void loop() {
   onLoop();            // High (on) state
 }
 
-void printBrightness(){
-  Serial.print("Current LED brightness is ");
-  Serial.print(currentBrightness,DEC);
-  Serial.print(", and LDR is ");
-  Serial.print(analogRead(ldrPin),DEC);
-  Serial.println(".");
-}
-
-void offLoop(){
-  
-  Serial.println("--- Entering OFF state ---");
+void offLoop(){ 
+  Log.Info("--- Entering OFF state ---");
   digitalWrite(greenLedPin, LOW);
-  unsigned long keepDimMs = 60000; // one minute
 
-//  printBrightness();
+  printSensors();
   
-  if (currentBrightness == 1000){
-     goToDimThousands(250);
+  if (currentBrightness == maxBrightness){
+     goToDimThousands(dimmedBrightness);
     
-//     printBrightness();
+     printSensors();
      if (isTooBrightDimmed()){
-       Serial.println("OFF: Too bright, turning off the lights completely.");
+       Log.Info("OFF: Too bright, turning off the lights completely.");
        goToDimThousands(0);
      }
-      
   }
   
   capsense.reset_CS_AutoCal();
 
-  unsigned long ignorePIRUntil = millis() + keepDimMs;
-  digitalWrite(yellowLedPin, LOW);
-
   // Low (off) state
   while(true) {
     if (hasTouched()){
-      digitalWrite(yellowLedPin, HIGH);
-      Serial.println("OFF: User touched sensor. Exit.");
+      Log.Info("OFF: User touched sensor. Exit.");
       return;
     }
 
@@ -137,59 +129,66 @@ void offLoop(){
     }
     
     if (hasPIR()) {
-      ignorePIRUntil = millis() + keepDimMs;
+      ignorePIRUntil = millis() + keepOffDimMs;
 
-      if(currentBrightness != 250) {
-        Serial.println("OFF: PIR activity in the dark. Turning on the lights.");
-        goToDimThousands(250);
-        printBrightness();
+      if(currentBrightness != dimmedBrightness) {
+        Log.Info("OFF: PIR  in the dark. Turning on the lights.");
+        goToDimThousands(dimmedBrightness);
+        printSensors();
       }
-    } else if (currentBrightness == 250 && isPassed(ignorePIRUntil)) {
-      Serial.println("OFF: No more PIR activity. Turning off the lights.");
+    } else if (currentBrightness == dimmedBrightness && isPassed(ignorePIRUntil)) {
+      Log.Info("OFF: No more PIR activity. Turning off the lights.");
       goToDimThousands(0);
     }
   }
 }
 
 void onLoop() {
-  Serial.println("--- Entering ON state ---");
+  Log.Info("--- Entering ON state ---");
   digitalWrite(greenLedPin, HIGH);
 
-  goToDimThousands(1000);
+  goToDimThousands(maxBrightness);
   capsense.reset_CS_AutoCal();
   
-  unsigned long keepBrightMs = 300000; // five minutes
-
-  unsigned long keepDimMs = 7200000; // two hours
   unsigned long ignorePIRUntil = millis() + keepBrightMs;
-  digitalWrite(yellowLedPin, LOW);
-
+ 
   while(true) {
     if (hasTouched()){
-      digitalWrite(yellowLedPin, HIGH);
-      Serial.println("ON: User touched sensor. Exit.");
+      Log.Info("ON: User touched sensor. Exit.");
       return;
     }
      
     if (hasPIR()){
       ignorePIRUntil = millis() + keepBrightMs;
       
-      if (currentBrightness != 1000) {
-        Serial.println("ON: PIR activity. Switching to full brightness.");
-        goToDimThousands(1000);
+      if (currentBrightness != maxBrightness) {
+        Log.Info("ON: PIR activity. Switching to full brightness.");
+        goToDimThousands(maxBrightness);
         capsense.reset_CS_AutoCal();
       }
-    } else if (currentBrightness == 1000 && isPassed(ignorePIRUntil)) {
-      Serial.println("ON: No PIR activity for a while. Dimming the lights.");
-      goToDimThousands(250, 20, true);
+    } else if (currentBrightness == maxBrightness && isPassed(ignorePIRUntil)) {
+      Log.Info("ON: No PIR activity for a while. Dimming the lights.");
+      goToDimThousands(dimmedBrightness, 20, true);
       capsense.reset_CS_AutoCal();
-      ignorePIRUntil = millis() + keepDimMs;
-    } else if (currentBrightness == 250 && isTooBrightDimmed()) {      
-      Serial.println("ON: Dimmed lights in ON state, and still too bright. Exit ON state.");
+      ignorePIRUntil = millis() + keepOnDimMs;
+    } else if (currentBrightness == dimmedBrightness && isTooBrightDimmed()) {      
+      Log.Info("ON: Dimmed lights in ON state, and still too bright. Exit ON state.");
       return;
-    } else if (currentBrightness == 250 && isPassed(ignorePIRUntil)) {      
-      Serial.println("ON: No PIR activity for a long time. Exit ON state.");
+    } else if (currentBrightness == dimmedBrightness && isPassed(ignorePIRUntil)) {      
+      Log.Info("ON: No PIR activity for a long time. Exit ON state.");
       return;
     }
+  }
+}
+
+void blinkSignalLeds(){
+  const int delayms = 50;
+  for(int i=1; i<3; i++) {
+    digitalWrite(redLedPin, HIGH);    delay(delayms);
+    digitalWrite(yellowLedPin, HIGH); delay(delayms);
+    digitalWrite(greenLedPin, HIGH);  delay(delayms);
+    digitalWrite(redLedPin, LOW);     delay(delayms);
+    digitalWrite(yellowLedPin, LOW);  delay(delayms);
+    digitalWrite(greenLedPin, LOW);   delay(delayms);
   }
 }

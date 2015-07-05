@@ -1,6 +1,3 @@
-#define touchSensitivity 1800
-#define darkness 400
-#define darknessWithDimmedLights 80
 
 boolean personPresent = false;
 
@@ -20,22 +17,15 @@ boolean isDark(){
 }
 
 boolean hasTouched() {
-  delay(1);
   long sense = capsense.capacitiveSensor(30);
-  if ( sense < 0 || sense > touchSensitivity) {
-    blink();
-    Serial.print("Touched sensor ");
-    Serial.println(sense,DEC);
-    return true;
+  boolean touched = ( sense < 0 || sense > touchSensitivity);
+  digitalWrite(yellowLedPin, touched); 
+  
+  if (touched){
+    Log.Debug("Touch detected at level %d.",sense);
   }
-  return false;
-}
-
-void blink(){
-  digitalWrite(greenLedPin,HIGH);
-  delay(50);
-  digitalWrite(greenLedPin,LOW);
-  delay(50);
+  
+  return touched;
 }
 
 boolean isPassed(unsigned long targetTime) {
@@ -43,10 +33,12 @@ boolean isPassed(unsigned long targetTime) {
   
   if ( targetTime > 2147483647 && currTime < 640000) {
     // rollover
+    Log.Debug("Current time rolled over, target time of %l has passed.",targetTime);
     return true;
   }
 
   if ( currTime > targetTime) {
+    Log.Debug("Target time of %l has passed.",targetTime);
     return true;
   }
 

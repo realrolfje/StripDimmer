@@ -4,22 +4,26 @@ void printTouch(){
     int i = 10;
     while(i--){    
       long total = capsense.capacitiveSensor(30);
-      Serial.println(total,DEC); 
+      Log.Info("Touch: %l",total); 
       delay(500); 
     }
     capsense.reset_CS_AutoCal();
-    Serial.println("reset autocal"); 
-
+    Log.Info("Reset calibration of Touch sensor."); 
   }
 }
 
 void printLDR(){
   while(true){
     int light = analogRead(ldrPin);
-    Serial.println(light);
+    Log.Info("LDR value: %d",light);
     delay(200);
   }
 }
+
+void printSensors(){
+  Log.Debug("RGB brightness is %d, LDR value is %d, PIR is %T",currentBrightness,analogRead(ldrPin),digitalRead(irPin));
+}
+
 
 void colorMixer() {
   int red = 127;
