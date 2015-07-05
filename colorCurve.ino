@@ -26,16 +26,15 @@ void goToDimThousands(int brightness, int stepDelayMs, boolean checkPIR) {
     inc = -1;
   }
   
-  for (int i=currentBrightness; i!=brightness; i = i + inc) {
-    dimThousands(i);
-    currentBrightness = i;
-    delay(stepDelayMs);
+  while (currentBrightness != brightness) {
+    currentBrightness = currentBrightness + inc;
+    dimThousands(currentBrightness);
     if (checkPIR && hasPIR()) {
       Log.Debug("Dimming interrupted at %d by PIR.",currentBrightness);
       break;
     }
+    delay(stepDelayMs);
   }  
-  currentBrightness = brightness;
 }
 
 
@@ -82,7 +81,7 @@ void stripColor(int newRed, int newGreen, int newBlue){
   if (newBlue != oldBlue) {analogWrite(bluePin,newBlue); oldBlue = newBlue; changed = true;}
   
   if (changed) {
-    Log.Debug("Set color to R=%d G=%d B=%d.",newRed,newGreen,newBlue);
+    Log.Verbose("R=%d G=%d B=%d.",newRed,newGreen,newBlue);
   }
 }
 

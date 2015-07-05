@@ -24,7 +24,7 @@ const int capsens_sense_pin = 3;
 //
 
 // Uncomment to switch off debugging
-#define DEBUG
+// #define DEBUG
 
 const int touchSensitivity = 1800;       // Lower value is higher Touch sensitivity.
 const int darkness = 400;                // LDR level at which lights will go on at PIR activity in OFF state.
@@ -35,14 +35,14 @@ const int dimmedBrightness = 250;        // Index used to set dimmed RGB LED bri
 
 #ifdef DEBUG
   #define LOGLEVEL LOG_LEVEL_DEBUG
-  const unsigned long keepBrightMs =  3000; // Max Full-Brightness time without PIR activity
-  const unsigned long keepOnDimMs  =  9000; // Max Dimmed time when ON without PIR activity
-  const unsigned long keepOffDimMs =  6000; // Max Dimmed time when OFF without PIR activity
+  const unsigned long keepBrightMs =  3000L; // Max Full-Brightness time without PIR activity
+  const unsigned long keepOnDimMs  =  9000L; // Max Dimmed time when ON without PIR activity
+  const unsigned long keepOffDimMs =  6000L; // Max Dimmed time when OFF without PIR activity
 #else 
-  #define LOGLEVEL LOG_LEVEL_ERROR
-  const unsigned long keepBrightMs =  300000; // Max Full-Brightness time without PIR activity
-  const unsigned long keepOnDimMs  = 7200000; // Max Dimmed time when ON without PIR activity
-  const unsigned long keepOffDimMs =   60000; // Max Dimmed time when OFF without PIR activity
+  #define LOGLEVEL LOG_LEVEL_INFO
+  const unsigned long keepBrightMs =  300000L; // Max Full-Brightness time without PIR activity
+  const unsigned long keepOnDimMs  = 7200000L; // Max Dimmed time when ON without PIR activity
+  const unsigned long keepOffDimMs =   60000L; // Max Dimmed time when OFF without PIR activity
 #endif
 
 //
@@ -58,15 +58,15 @@ int currentBrightness = 0;
 void setup() {
   Log.Init(LOGLEVEL, 57600L);
 
-  pinMode(redPin, OUTPUT);
+  pinMode(redPin,   OUTPUT);
   pinMode(greenPin, OUTPUT);
-  pinMode(bluePin, OUTPUT);
+  pinMode(bluePin,  OUTPUT);
 
-  pinMode(redLedPin, OUTPUT);
+  pinMode(redLedPin,    OUTPUT);
   pinMode(yellowLedPin, OUTPUT);
-  pinMode(greenLedPin, OUTPUT);
-  pinMode(irPin, INPUT);
+  pinMode(greenLedPin,  OUTPUT);
 
+  pinMode(irPin,  INPUT);
   pinMode(ldrPin, INPUT);
 
   blinkSignalLeds();
@@ -150,7 +150,7 @@ void onLoop() {
   goToDimThousands(maxBrightness);
   capsense.reset_CS_AutoCal();
   
-  unsigned long ignorePIRUntil = millis() + keepBrightMs;
+  ignorePIRUntil = millis() + keepBrightMs;
  
   while(true) {
     if (hasTouched()){
@@ -183,7 +183,7 @@ void onLoop() {
 
 void blinkSignalLeds(){
   const int delayms = 50;
-  for(int i=1; i<3; i++) {
+  for(int i=1; i<=3; i++) {
     digitalWrite(redLedPin, HIGH);    delay(delayms);
     digitalWrite(yellowLedPin, HIGH); delay(delayms);
     digitalWrite(greenLedPin, HIGH);  delay(delayms);
