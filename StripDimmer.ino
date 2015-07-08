@@ -36,7 +36,7 @@ const int dimmedBrightness = 250;        // Index used to set dimmed RGB LED bri
 #ifdef DEBUG
   #define LOGLEVEL LOG_LEVEL_DEBUG
   const unsigned long keepBrightMs =  3000L; // Max Full-Brightness time without PIR activity
-  const unsigned long keepOnDimMs  =  9000L; // Max Dimmed time when ON without PIR activity
+  const unsigned long keepOnDimMs  = 10000L; // Max Dimmed time when ON without PIR activity
   const unsigned long keepOffDimMs =  6000L; // Max Dimmed time when OFF without PIR activity
 #else 
   #define LOGLEVEL LOG_LEVEL_INFO

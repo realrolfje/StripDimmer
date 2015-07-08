@@ -29,9 +29,12 @@ boolean hasTouched() {
 }
 
 boolean isPassed(unsigned long targetTime) {
+  // Set to a bigger value than maximum time between calls of "isPassed".
+  const long checkloopresolutionMs = 10000;
+  
   unsigned long currTime = millis();
   
-  if ( targetTime > 2147483647 && currTime < 640000) {
+  if ( targetTime > 2147483647 && currTime < (2147483647 - checkloopresolutionMs)) {
     // rollover
     Log.Debug("Current time rolled over, target time of %l has passed.",targetTime);
     return true;
