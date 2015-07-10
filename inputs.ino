@@ -18,6 +18,7 @@ boolean isDark(){
 
 boolean hasTouched() {
   long sense = capsense.capacitiveSensor(30);
+
   boolean touched = ( sense < 0 || sense > touchSensitivity);
   digitalWrite(yellowLedPin, touched); 
   
@@ -30,18 +31,19 @@ boolean hasTouched() {
 
 boolean isPassed(unsigned long targetTime) {
   // Set to a bigger value than maximum time between calls of "isPassed".
-  const long checkloopresolutionMs = 10000;
+  const long checkloopresolutionMs = 10000L;
+  const unsigned long halftime = 2147483647L;
   
   unsigned long currTime = millis();
   
-  if ( targetTime > 2147483647 && currTime < (2147483647 - checkloopresolutionMs)) {
-    // rollover
-    Log.Debug("Current time rolled over, target time of %l has passed.",targetTime);
+  if ( currTime > targetTime) {
+    Log.Debug("Target time of %l has passed.",targetTime);
     return true;
   }
 
-  if ( currTime > targetTime) {
-    Log.Debug("Target time of %l has passed.",targetTime);
+  if ( targetTime > halftime && currTime < (halftime - checkloopresolutionMs)) {
+    // rollover
+    Log.Debug("Current time rolled over, target time of %l has passed.",targetTime);
     return true;
   }
 

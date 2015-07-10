@@ -100,7 +100,7 @@ void offLoop(){
 
   printSensors();
   
-  if (currentBrightness == maxBrightness){
+  if (currentBrightness >= dimmedBrightness){
      goToDimThousands(dimmedBrightness);
     
      printSensors();
@@ -120,9 +120,12 @@ void offLoop(){
     }
 
     if (currentBrightness == 0 && !isDark()) {
-      // Only lights the red led if somebody walks by.
+      // Call to hasPIR() to turn the red indicator led on or off
       hasPIR();
-      delay(50);
+      digitalWrite(greenLedPin, HIGH);
+      delay(10);
+      digitalWrite(greenLedPin, LOW);
+      delay(40);
 
       // Skip rest of loop, no need to turn on ligths if it's not dark.
       continue;
@@ -171,9 +174,11 @@ void onLoop() {
       goToDimThousands(dimmedBrightness, 20, true);
       capsense.reset_CS_AutoCal();
       ignorePIRUntil = millis() + keepOnDimMs;
-    } else if (currentBrightness == dimmedBrightness && isTooBrightDimmed()) {      
-      Log.Info("ON: Dimmed lights in ON state, and still too bright. Exit ON state.");
-      return;
+      
+      if (currentBrightness == dimmedBrightness && isTooBrightDimmed()) {      
+        Log.Info("ON: Dimmed lights in ON state, and still too bright. Exit ON state.");
+        return;
+      }
     } else if (currentBrightness == dimmedBrightness && isPassed(ignorePIRUntil)) {      
       Log.Info("ON: No PIR activity for a long time. Exit ON state.");
       return;
