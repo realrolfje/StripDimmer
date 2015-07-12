@@ -24,11 +24,11 @@ const int capsens_sense_pin = 3;
 //
 
 // Uncomment to switch off debugging
- #define DEBUG
+//#define DEBUG
 
 const int touchSensitivity = 1800;       // Lower value is higher Touch sensitivity.
 const int darkness = 150;                // LDR level at which lights will go on at PIR activity in OFF state.
-const int darknessWithDimmedLights = 90; // LDR level at which lights will go completely off when going from ON to OFF state.
+const int darknessWithDimmedLights = 50; // LDR level at which lights will go completely off when going from ON to OFF state.
 
 const int maxBrightness = 1000;          // Index used to set the highest RGB LED brightness.
 const int dimmedBrightness = 250;        // Index used to set dimmed RGB LED brightness.
