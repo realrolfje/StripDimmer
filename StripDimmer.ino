@@ -24,11 +24,11 @@ const int capsens_sense_pin = 3;
 //
 
 // Uncomment to switch off debugging
-// #define DEBUG
+ #define DEBUG
 
 const int touchSensitivity = 1800;       // Lower value is higher Touch sensitivity.
-const int darkness = 400;                // LDR level at which lights will go on at PIR activity in OFF state.
-const int darknessWithDimmedLights = 80; // LDR level at which lights will go completely off when going from ON to OFF state.
+const int darkness = 150;                // LDR level at which lights will go on at PIR activity in OFF state.
+const int darknessWithDimmedLights = 90; // LDR level at which lights will go completely off when going from ON to OFF state.
 
 const int maxBrightness = 1000;          // Index used to set the highest RGB LED brightness.
 const int dimmedBrightness = 250;        // Index used to set dimmed RGB LED brightness.
@@ -98,12 +98,9 @@ void offLoop(){
   Log.Info("--- Entering OFF state ---");
   digitalWrite(greenLedPin, LOW);
 
-  printSensors();
-  
   if (currentBrightness >= dimmedBrightness){
      goToDimThousands(dimmedBrightness);
-    
-     printSensors();
+
      if (isTooBrightDimmed()){
        Log.Info("OFF: Too bright, turning off the lights completely.");
        goToDimThousands(0);
@@ -122,11 +119,6 @@ void offLoop(){
     if (currentBrightness == 0 && !isDark()) {
       // Call to hasPIR() to turn the red indicator led on or off
       hasPIR();
-      digitalWrite(greenLedPin, HIGH);
-      delay(10);
-      digitalWrite(greenLedPin, LOW);
-      delay(40);
-
       // Skip rest of loop, no need to turn on ligths if it's not dark.
       continue;
     }
@@ -137,7 +129,6 @@ void offLoop(){
       if(currentBrightness != dimmedBrightness) {
         Log.Info("OFF: PIR  in the dark. Turning on the lights.");
         goToDimThousands(dimmedBrightness);
-        printSensors();
       }
     } else if (currentBrightness == dimmedBrightness && isPassed(ignorePIRUntil)) {
       Log.Info("OFF: No more PIR activity. Turning off the lights.");

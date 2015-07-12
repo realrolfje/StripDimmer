@@ -36,6 +36,7 @@ void goToDimThousands(int brightness, int stepDelayMs, boolean checkPIR) {
     delay(stepDelayMs);
   }  
   Log.Debug("Dimming finished, now at %d.",currentBrightness);
+  printSensors();
 }
 
 
