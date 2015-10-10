@@ -30,11 +30,13 @@ Plug the Arduino Nano into a breadboard, and build the circuit according to the 
 When the colors look off, check that you didn't mix up the red, green and blue LEDs of your led strip. Depending on the manufacturer or production run of your LED strip, the colors might not look like what you expected. Or maybe you want to dim it from green to purple. You can do just that by changing the colorcurve arrray in colorCurve.ino. 
 
 You have two tools to do this:
+
 1. In the documentation folder, there is an excel sheet which shows the different PWM values, plotted as a graph. In this graph you can see that in my software, I never give more than 50% energy to the blue LEDs, because these make the color too cold/blue. You can play with the values in the sheet and try to find a smooth "curve", and put that in the software. This requires a bit of guesswork, so it's better to use rool number 2:
 2. In testStuff.ino, there is a function called "colorMixer". Call this method in the loop(). After the Arduino starts up, open the Serial Monitor of the Arduino IDE. You can now play with the RGB values as follows:
-  - For more red, press 'Shift-R', for less red, press 'r'.
-  - For more green, press 'Shift-G', for less red, press 'g'.
-  - For more blue, press 'Shift-B', for less red, press 'b'.
+    - For more red, press 'Shift-R', for less red, press 'r'.
+    - For more green, press 'Shift-G', for less red, press 'g'.
+    - For more blue, press 'Shift-B', for less red, press 'b'.
+    
 In the serial monitor, the software will print the current PWM values. Use this to judge the color and build your color curve.
 
 ## Calibrating the touch sensor
