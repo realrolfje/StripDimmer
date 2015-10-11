@@ -24,7 +24,7 @@ To build this project, you need:
 4. Upload.
 
 ## How to build the project
-Plug the Arduino Nano into a breadboard, and build the circuit according to the schematic in the documentation folder. Hook up your LED strip and test the software.
+Plug the Arduino Nano into a breadboard, and build the circuit according to the schematic below, also found as eagle file in the schematics folder. Find a value for the 1~10k resistor so that a dark LDR will make A0 reach at most 5 Volts. Hook up your LED strip and test the software.
 
 ![Schematic](schematics/StripDimmer.png?raw=true)
 
