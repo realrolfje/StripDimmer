@@ -26,7 +26,9 @@ To build this project, you need:
 ## How to build the project
 Plug the Arduino Nano into a breadboard, and build the circuit according to the schematic in the documentation folder. Hook up your LED strip and test the software.
 
-![Schematic](documentation/StripDimmer-schema.jpg?raw=true)
+![Schematic](schematics/StripDimmer.png?raw=true)
+
+Schematics are edited in [Eagle](http://www.cadsoftusa.com/eagle-pcb-design-software/schematic-editor/).
 
 ### Calibrating colors
 When the colors look off, check that you didn't mix up the red, green and blue LEDs of your led strip. Depending on the manufacturer or production run of your LED strip, the colors might not look like what you expected. Or maybe you want to dim it from green to purple. You can do just that by changing the `colorcurve` arrray in `colorCurve.ino`. 
