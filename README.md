@@ -77,4 +77,7 @@ Although the settings should be correct, you may want to make the StripDimmer sl
 - `keepOffDimMs`: When the StripDimmer is at 25%, this is the time after which de StripDimmer decides to switch the lights off. The default is 1 minute. PIR activity within this time resets the timer and keeps the lights at 25%.
 
 ### Putting it in a housing
-Be creative. Pay attention to the cooling fins of the BUK555. They are connected to the DRAIN, so you should isolate them from ground. See the supplied datasheet. Make sure you place the PIR sensor in a smart place, and create a nice aluminum strip as a touch sensor which can also act as reflector to hide the strip.
+Be creative. A metal housing is best, both for radiated electromagnetic noise from the PWM, but also for being resistant to external noise which can interfere with the touch or PIR sensor. Tips to think about before picking up a drill:
+- Pay attention to the cooling fins of the BUK555. They are connected to the DRAIN, so you should isolate them from ground. Check the [BUK555 datasheet](documentation/BUK555-100A%20N%20Channel%20PowerMOS%20TTL%20FET.pdf?raw=true).
+- Make sure you place the PIR sensor in a smart place. The corned or a room is best, check the [datasheet of the PIR sensor](documentation/HC-SR501-PIR%20Sensor.pdf?raw=true) to see the viewing angle of the sensor.
+- Polish an aluminum strip to double as a touch sensor and reflector to hide the LED strip.
