@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 0)
+  (lib (name "RGB-LED-dimmer-eagle-import")(type "KiCad")(uri "${KIPRJMOD}/RGB-LED-dimmer-eagle-import.kicad_sym")(options "")(descr ""))
+)

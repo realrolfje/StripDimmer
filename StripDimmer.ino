@@ -1,12 +1,14 @@
 #include <CapacitiveSensor.h>
 #include <Logging.h>
+#include <Adafruit_NeoPixel.h>
 
 //
 // Hardware configuration
 //
-const int redPin   = 9;
-const int greenPin = 10;
-const int bluePin  = 11;
+
+/* NeoPixel Serial data out. */
+#define NEOPIXEL_DATAPIN  9
+const byte  NUMPIXELS    =  15;
 
 const int redLedPin = 7;
 const int yellowLedPin = 8;
@@ -55,12 +57,16 @@ CapacitiveSensor capsense = CapacitiveSensor(capsens_signal_pin,capsens_sense_pi
 
 int currentBrightness = 0;
 
+// When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
+// Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
+// example for more information on possible values.
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, NEOPIXEL_DATAPIN, NEO_GRBW + NEO_KHZ800);
+
+const uint32_t white = pixels.Color(100,0,0,127);
+
+
 void setup() {
   Log.Init(LOGLEVEL, 57600L);
-
-  pinMode(redPin,   OUTPUT);
-  pinMode(greenPin, OUTPUT);
-  pinMode(bluePin,  OUTPUT);
 
   pinMode(redLedPin,    OUTPUT);
   pinMode(yellowLedPin, OUTPUT);
@@ -70,7 +76,13 @@ void setup() {
   pinMode(ldrPin, INPUT);
 
   blinkSignalLeds();
-  stripColor(0,0,0);
+
+
+  /* Initialize pixels and clear if they were already on */
+  pixels.begin();
+  pixels.clear();
+  pixels.show();
+  stripColor(0,0,0,0);
   
   capsense.set_CS_AutocaL_Millis(5000);
   capsense.set_CS_Timeout_Millis(200);
